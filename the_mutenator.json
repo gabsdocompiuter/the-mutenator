@@ -1,8 +1,7 @@
 {
-    "meeting_app": "teams",
-    "volume_downcrase": 20,
-    "processes": [
-        "spotify",
-        "chrome"
+    "meeting_app": "ms-teams",
+    "volume_downcrase": 70,
+    "exceptions": [
+        "msedgewebview2"
     ]
 }
