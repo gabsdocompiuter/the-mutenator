@@ -93,7 +93,7 @@ class TheMutenator:
     def change_icon(self, in_meeting: bool) -> None:
         icon_path = f'icons/volume-{'off' if in_meeting else 'on'}.ico'
         self.icon.icon = Image.open(icon_path)
-        self.icon.title = 'Em reunião' if in_meeting else 'Disponível'
+        self.icon.title = 'The Mutenator: Em reunião' if in_meeting else 'The Mutenator'
         self.icon._update_icon()
 
 
