@@ -1,6 +1,11 @@
 import json
-from dataclasses import dataclass
 
+from dataclasses import dataclass
+from windows_toasts import (
+    WindowsToaster,
+    Toast,
+    ToastScenario
+)
 from pycaw.pycaw import (
     AudioSession,
     AudioUtilities,
@@ -31,6 +36,25 @@ def read_config() -> TheMutenatorConfig:
     return config
 
 
+def formatar_list(app_list: list[str]) -> str:
+    if not app_list:
+        return ''
+    elif len(app_list) == 1:
+        return app_list[0]
+    else:
+        return ', '.join(app_list[:-1]) + ' e ' + app_list[-1]
+
+
+def show_notification(notification_text: str, app_list: list[str]) -> None:
+    toaster = WindowsToaster('The Mutenator')
+    toast = Toast(scenario=ToastScenario.Important)
+    toast.text_fields = [
+        notification_text,
+        formatar_list(app_list).replace('.exe', '')
+    ]
+    toaster.show_toast(toast)
+
+
 def full_app_name(app: str) -> str:
     if app.endswith('.exe'):
         return app.lower()
@@ -57,6 +81,8 @@ def change_apps_volume(config: TheMutenatorConfig, volume_change: int) -> None:
         for app in config.exceptions
     ]
 
+    apps_ajustados: list[str] = []
+
     sessions: list[AudioSession] = AudioUtilities.GetAllSessions()
     for session in sessions:
         session: AudioSession
@@ -65,16 +91,19 @@ def change_apps_volume(config: TheMutenatorConfig, volume_change: int) -> None:
             continue
 
         app_volume = session._ctl.QueryInterface(ISimpleAudioVolume)
-        
+
         volume_atual = app_volume.GetMasterVolume()
         novo_volume = volume_atual + volume_change / 100
 
-        novo_volume = min(0, novo_volume)
-        novo_volume = max(1, novo_volume)
+        novo_volume = 0 if novo_volume < 0 else novo_volume
+        novo_volume = 1 if novo_volume > 1 else novo_volume
 
         app_volume.SetMasterVolume(novo_volume, None)
 
-        print(f'Volume do app {session.Process.name().lower()} alterado de {volume_atual:02f} para {novo_volume:02f}')
+        apps_ajustados.append(session.Process.name().lower())
+
+    notification_text: str = f'Volume dos apps {'reduzido' if volume_change < 0 else 'aumentado novamente'}'
+    show_notification(notification_text, apps_ajustados)
 
 
 def mute_apps() -> None:
