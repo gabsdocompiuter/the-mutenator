@@ -1,7 +1,12 @@
 import json
 from dataclasses import dataclass
 
-from pycaw.pycaw import AudioUtilities, IAudioMeterInformation, AudioSession
+from pycaw.pycaw import (
+    AudioSession,
+    AudioUtilities,
+    ISimpleAudioVolume,
+    IAudioMeterInformation,
+)
 
 
 @dataclass
@@ -59,7 +64,17 @@ def change_apps_volume(config: TheMutenatorConfig, volume_change: int) -> None:
         if not session.Process or session.Process.name().lower() in exceptions:
             continue
 
-        print(f'ajustar o volume do app {session.Process.name().lower()} em {volume_change}%')
+        app_volume = session._ctl.QueryInterface(ISimpleAudioVolume)
+        
+        volume_atual = app_volume.GetMasterVolume()
+        novo_volume = volume_atual + volume_change / 100
+
+        novo_volume = min(0, novo_volume)
+        novo_volume = max(1, novo_volume)
+
+        app_volume.SetMasterVolume(novo_volume, None)
+
+        print(f'Volume do app {session.Process.name().lower()} alterado de {volume_atual:02f} para {novo_volume:02f}')
 
 
 def mute_apps() -> None:
