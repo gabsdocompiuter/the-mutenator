@@ -102,7 +102,7 @@ def change_apps_volume(config: TheMutenatorConfig, volume_change: int) -> None:
 
         apps_ajustados.append(session.Process.name().lower())
 
-    notification_text: str = f'Volume dos apps {'reduzido' if volume_change < 0 else 'aumentado novamente'}'
+    notification_text: str = f'Volume dos apps {f'reduzido em {config.volume_downcrase}%' if volume_change < 0 else 'aumentado novamente'}'
     show_notification(notification_text, apps_ajustados)
 
 
