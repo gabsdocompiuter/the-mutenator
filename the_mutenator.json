@@ -1,6 +1,6 @@
 {
     "meeting_app": "ms-teams",
-    "volume_downcrase": 80,
+    "volume_decrease_percent": 80,
     "exceptions": [
         "msedgewebview2"
     ]
